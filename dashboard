@@ -1,0 +1,401 @@
+from tkinter import *
+import tkinter
+from ttkbootstrap import Style
+import customtkinter as custom
+from tkinter import messagebox
+from PIL import ImageTk, Image
+from tkinter import PhotoImage
+import ttkbootstrap as bootstrap
+from ttkbootstrap.tableview import Tableview
+from ttkbootstrap.constants import *
+from tkinter import ttk
+
+# Create a function to open different sections in frame2
+def open_section(section_func):
+    # Clear the current content of frame2
+    for widget in frame2.winfo_children():
+        widget.destroy()
+    # Call the provided section function to populate frame2
+    section_func()
+
+# fuctions
+def open_dashboard():
+    frame3 = bootstrap.Frame(frame2, bootstyle="dark")
+    frame3.pack(padx=10, pady=10)
+
+    button1 = bootstrap.Button(
+        frame3, bootstyle="danger", text="Quantity of sales", padding=(180, 90)
+    )
+    button1.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
+
+    button2 = bootstrap.Button(
+        frame3, bootstyle="secondary", text="Revenue", padding=(180, 90)
+    )
+    button2.grid(row=1, column=1, padx=20, pady=20, sticky="nsew")
+
+    button3 = bootstrap.Button(
+        frame3, bootstyle="success", text="Profit", padding=(180, 90)
+    )
+    button3.grid(row=1, column=2, padx=20, pady=20, sticky="nsew")
+
+    button4 = bootstrap.Button(
+        frame3, bootstyle="info", text="Value of stock", padding=(180, 90)
+    )
+    button4.grid(row=2, column=0, padx=20, pady=20, sticky="nsew")
+
+    button5 = bootstrap.Button(
+        frame3, bootstyle="primary", text="Total Customers", padding=(180, 90)
+    )
+    button5.grid(row=2, column=1, padx=20, pady=20, sticky="nsew")
+
+    button6 = bootstrap.Button(
+        frame3, bootstyle="warning", text="Pharmacists", padding=(180, 90)
+    )
+    button6.grid(row=2, column=2, padx=20, pady=20, sticky="nsew")
+
+
+def open_invoice():
+    # Create a Frame to hold the invoice details
+    frame_invoice = bootstrap.Frame(frame2, bootstyle="dark")
+    frame_invoice.pack(fill="both", expand=True, padx=10, pady=10)
+
+    # Create labels and entry fields for the invoice details
+    def add_medicine_to_invoice():
+        company_name = entry_company_name.get()
+        medicine_name = entry_medicine.get()
+        quantity = int(entry_quantity.get())  # Convert quantity to an integer
+        price = float(entry_price.get())  # Convert price to a float
+        expiry_date = entry_expiry.get()
+
+        # Calculate the total price for the item
+        total_price = quantity * price
+
+        # Calculate the number (index) of the added item
+        num_items = len(tree.get_children()) + 1
+
+        # Add the medicine details to the Treeview with the number and total price
+        tree.insert("", "end", values=(num_items, medicine_name, company_name, quantity, price, expiry_date, total_price))
+
+        # Clear the input fields
+        entry_company_name.delete(0, "end")
+        entry_medicine.delete(0, "end")
+        entry_quantity.delete(0, "end")
+        entry_price.delete(0, "end")
+        entry_expiry.delete(0, "end")
+
+    def create_treeview(frame):
+        tree_columns = ("#", "Medicine", "Company Name", "Quantity", "Price", "Expiry Date", "Total Price")
+        tree = ttk.Treeview(frame, columns=tree_columns, show="headings")
+        for column in tree_columns:
+            tree.heading(column, text=column)
+            tree.column(column, width=120)  # Adjust the column width as needed
+        tree.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
+        return tree
+
+
+
+    # Create labels and entry fields for the invoice details
+    label_company_name = tkinter.Label(frame_invoice, text="Company Name")
+    label_company_name.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+
+    entry_company_name = tkinter.Entry(frame_invoice)
+    entry_company_name.grid(row=0, column=1, padx=10, pady=5, sticky="w")
+
+    label_medicine = tkinter.Label(frame_invoice, text="Medicine Name")
+    label_medicine.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+
+    entry_medicine = tkinter.Entry(frame_invoice)
+    entry_medicine.grid(row=1, column=1, padx=10, pady=5, sticky="w")
+
+    label_quantity = tkinter.Label(frame_invoice, text="Quantity")
+    label_quantity.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+
+    entry_quantity = tkinter.Entry(frame_invoice)
+    entry_quantity.grid(row=2, column=1, padx=10, pady=5, sticky="w")
+
+    label_price = tkinter.Label(frame_invoice, text="Price")
+    label_price.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+
+    entry_price = tkinter.Entry(frame_invoice)
+    entry_price.grid(row=3, column=1, padx=10, pady=5, sticky="w")
+
+    label_expiry = tkinter.Label(frame_invoice, text="Expiry Date")
+    label_expiry.grid(row=4, column=0, padx=10, pady=5, sticky="w")
+
+    entry_expiry = tkinter.Entry(frame_invoice)
+    entry_expiry.grid(row=4, column=1, padx=10, pady=5, sticky="w")
+
+    # Create a Button to add the medicine to the invoice
+    add_button = tkinter.Button(
+        frame_invoice, text="Add Medicine", command=add_medicine_to_invoice
+    )
+    add_button.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
+    def print_invoice():
+        # Implement logic to finalize and print the invoice
+        open_medicine(tree)
+        pass
+    # Create the Treeview using the create_treeview function
+    tree = create_treeview(frame_invoice)
+    
+    # Create a Button to finalize and print the invoice
+    print_button = tkinter.Button(
+        frame_invoice, text="Print Invoice", command=print_invoice
+    )
+    
+    print_button.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
+
+
+def open_sales():
+    # Create a ttkbootstrap style
+    style = Style(theme="morph")
+
+    # Create a frame to hold the table view
+    frame = ttk.Frame(frame2, style="dark")
+    frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+    # Define patients_no_entry here to avoid the "not defined" error
+    patients_no_entry = None
+
+    # Function to add sales data to the treeview
+    def add_sales_data():
+        nonlocal patients_no_entry  # Add nonlocal declaration
+        medicine_name = medicine_name_entry.get()
+        quantity_sold = int(quantity_sold_entry.get())
+        unit_price = float(unit_price_entry.get())
+        patients_no = int(patients_no_entry.get())
+        total_price = quantity_sold * unit_price
+
+        sales_data.append((medicine_name, quantity_sold, f"Ksh {total_price:.2f}", patients_no))
+        tree.insert(
+            "", "end", values=(medicine_name, quantity_sold, f"Ksh {total_price:.2f}", patients_no)
+        )
+
+        # Clear the input fields
+        medicine_name_entry.delete(0, "end")
+        quantity_sold_entry.delete(0, "end")
+        unit_price_entry.delete(0, "end")
+        patients_no_entry.delete(0, "end")
+
+    # Create entry fields for input
+    medicine_name_label = ttk.Label(frame, text="Medicine Name:")
+    medicine_name_label.pack()
+    medicine_name_entry = ttk.Entry(frame)
+    medicine_name_entry.pack()
+
+    quantity_sold_label = ttk.Label(frame, text="Quantity Sold:")
+    quantity_sold_label.pack()
+    quantity_sold_entry = ttk.Entry(frame)
+    quantity_sold_entry.pack()
+
+    unit_price_label = ttk.Label(frame, text="Unit Price:")
+    unit_price_label.pack()
+    unit_price_entry = ttk.Entry(frame)
+    unit_price_entry.pack()
+    
+    patient_no_label = ttk.Label(frame, text="Patient's No:")
+    patient_no_label.pack()
+    patients_no_entry = ttk.Entry(frame)  # Define patients_no_entry
+    patients_no_entry.pack()
+    
+    add_button = ttk.Button(frame, text="Add Sales Data", command=add_sales_data)
+    add_button.pack()
+
+    # Define sample sales data
+    sales_data = []
+
+    # Create a treeview widget for displaying sales data
+    tree = ttk.Treeview(
+        frame, columns=("Medicine Name", "Quantity Sold", "Total Price", "Patient's No")
+    )
+    tree.heading("#1", text="Medicine Name")
+    tree.heading("#2", text="Quantity Sold")
+    tree.heading("#3", text="Total Price")
+    tree.heading("#4", text="Patient's No")
+    tree.pack(fill="both", expand=True, padx=100, pady=50)
+
+
+def open_pharmacist():
+    coldata = [
+        {"text": "Pharmacist Name", "stretch": False},
+        "Contact Number",
+        {"text": "E-mail Address", "stretch": False},
+    ]
+
+    rowdata = [
+        ("James Maina", "0122435687", " mainajamo@gmail.com"),
+        ("Victor Chirchir", "0798675423", " chirchir@gmail.com"),
+        ("Sandra Wanjiru", "0723435665", " shikowanjs@gmail.com"),
+        ("Shadrack Olusala", "0124346670", " olusalajames@gmail.com"),
+        ("Bernad Aketch", "0745613500", " aketchaketch@gmail.com"),
+        ("liz Nduku", "0112543280", " ndukuliz@gmail.com"),
+    ]
+
+    dt = Tableview(
+        master=frame2,
+        coldata=coldata,
+        rowdata=rowdata,
+        paginated=True,
+        searchable=True,
+        bootstyle=PRIMARY,
+        stripecolor=(colors.light, None),
+    )
+    dt.pack(fill=BOTH, expand=YES, padx=10, pady=10)
+
+
+def open_medicine():
+    coldata = [
+        {"text": "Medicine", "stretch": True},
+        "Quantity",
+        {"text": "Price", "stretch": False},
+    ]
+
+    rowdata = [
+        ("Aspirin", "100 tablets", "KES 500.00"),
+        ("Ibuprofen", "100 tablets", "KES 250.00"),
+        ("Amoxicillin", "100 capsules", "KES 1,000.00"),
+        ("Omeprazole", "100 tablets", "KES 400.00"),
+        ("Lisinopril", "100 tablets", "KES 750.00"),
+        ("Atorvastatin", "100 tablets", "KES 600.00"),
+        ("Acetaminophen", "100 tablets", "KES 350.00"),
+        ("Ciprofloxacin", "100 tablets", "KES 800.00"),
+        ("Simvastatin", "100 tablets", "KES 900.00"),
+        ("Prednisone", "100 tablets", "KES 1,200.00"),
+        ("Metformin", "100 tablets", "KES 550.00"),
+        ("Losartan", "100 tablets", "KES 650.00"),
+        ("Azithromycin", "100 capsules", "KES 1,100.00"),
+        ("Doxycycline", "100 tablets", "KES 600.00"),
+        ("Hydrochlorothiazide", "100 tablets", "KES 450.00"),
+        ("Sertraline", "100 tablets", "KES 700.00"),
+        ("Metoprolol", "100 tablets", "KES 750.00"),
+        ("Albuterol", "100 tablets", "KES 850.00"),
+        ("Fluoxetine", "100 tablets", "KES 500.00"),
+        ("Gabapentin", "100 tablets", "KES 950.00"),
+        ("Amlodipine", "100 tablets", "KES 1,050.00"),
+        ("Levothyroxine", "100 tablets", "KES 650.00"),
+        ("Amoxicillin/Clavulanate", "100 tablets", "KES 1,450.00"),
+        ("Montelukast", "100 tablets", "KES 1,150.00"),
+        ("Cephalexin", "100 tablets", "KES 1,350.00"),
+        ("Tramadol", "100 tablets", "KES 1,250.00"),
+        ("Losartan/Hydrochlorothiazide", "100 tablets", "KES 1,550.00"),
+        ("Tadalafil", "100 tablets", "KES 1,600.00"),
+        ("Fluticasone", "100 tablets", "KES 800.00"),
+        ("Prednisolone", "100 tablets", "KES 550.00"),
+        ("Warfarin", "100 tablets", "KES 700.00"),
+        ("Clopidogrel", "100 tablets", "KES 1,000.00"),
+        ("Methotrexate", "100 tablets", "KES 900.00"),
+        ("Sildenafil", "100 tablets", "KES 650.00"),
+        ("Meloxicam", "100 tablets", "KES 1,100.00"),
+        ("Atenolol", "100 tablets", "KES 750.00"),
+        ("Citalopram", "100 tablets", "KES 600.00"),
+        ("Fluconazole", "100 tablets", "KES 400.00"),
+        ("Esomeprazole", "100 tablets", "KES 900.00"),
+        ("Fluvoxamine", "100 tablets", "KES 800.00"),
+        ("Naproxen", "100 tablets", "KES 500.00"),
+        ("Lorazepam", "100 tablets", "KES 700.00"),
+        ("Ranitidine", "100 tablets", "KES 550.00"),
+        ("Duloxetine", "100 tablets", "KES 1,050.00"),
+        ("Cetirizine", "100 tablets", "KES 650.00"),
+        ("Metronidazole", "100 tablets", "KES 450.00"),
+        ("Venlafaxine", "100 tablets", "KES 700.00"),
+        ("Diazepam", "100 tablets", "KES 600.00"),
+        ("Fluocinonide", "100 tablets", "KES 400.00"),
+        ("Clobetasol", "100 tablets", "KES 750.00"),
+        ("Hydrocortisone", "100 tablets", "KES 650.00"),
+        ("Nystatin", "100 tablets", "KES 500.00"),
+        ("Ketoconazole", "100 tablets", "KES 800.00"),
+        ("Mometasone", "100 tablets", "KES 950.00"),
+        ("Mupirocin", "100 tablets", "KES 500.00"),
+        ("Benzoyl Peroxide", "100 tablets", "KES 350.00"),
+        ("Tretinoin", "100 tablets", "KES 650.00"),
+        ("Econazole", "100 capsules", "KES 1,100.00"),
+        ("Latanoprost", "100 tablets", "KES 600.00"),
+        ("Methazolamide", "100 tablets", "KES 450.00"),
+        ("Dorzolamide", "100 tablets", "KES 700.00"),
+        ("Cyclopentolate", "100 tablets", "KES 750.00"),
+        ("Homatropine", "100 tablets", "KES 850.00"),
+        ("Dipivefrin", "100 tablets", "KES 500.00"),
+        ("Ketorolac", "100 tablets", "KES 950.00"),
+        ("Diclofenac", "100 tablets", "KES 1,050.00"),
+        ("Oxycodone", "100 tablets", "KES 650.00"),
+        ("Hydrocodone", "100 tablets", "KES 1,450.00"),
+        ("Codeine", "100 tablets", "KES 1,150.00"),
+        ("Morphine", "100 tablets", "KES 1,350.00"),
+        ("Fentanyl", "100 tablets", "KES 1,250.00"),
+        ("Tramadol", "100 tablets", "KES 1,550.00"),
+        ("Pregabalin", "100 tablets", "KES 1,600.00"),
+        ("Gabapentin", "100 tablets", "KES 800.00"),
+        ("Mirtazapine", "100 tablets", "KES 550.00"),
+        ("Trazodone", "100 tablets", "KES 700.00"),
+        ("Lorazepam", "100 tablets", "KES 1,000.00"),
+        ("Clonazepam", "100 tablets", "KES 900.00"),
+        ("Alprazolam", "100 tablets", "KES 650.00"),
+        ("Diazepam", "100 tablets", "KES 1,100.00"),
+        ("Zolpidem", "100 tablets", "KES 750.00"),
+        ("Eszopiclone", "100 tablets", "KES 600.00"),
+        ("Temazepam", "100 tablets", "KES 400.00"),
+        ("Estazolam", "100 tablets", "KES 900.00"),
+        ("Triazolam", "100 tablets", "KES 800.00"),
+        ("Zaleplon", "100 tablets", "KES 500.00"),
+        ("Modafinil", "100 tablets", "KES 700.00"),
+        ("Armodafinil", "100 tablets", "KES 550.00"),
+        ("Methylphenidate", "100 tablets", "KES 1,050.00"),
+        ("Amphetamine", "100 tablets", "KES 850.00"),
+        ("Dextroamphetamine", "100 tablets", "KES 450.00"),
+        ("Atomoxetine", "100 tablets", "KES 700.00"),
+        ("Bupropion", "100 tablets", "KES 500.00"),
+        ("Venlafaxine", "100 tablets", "KES 750.00"),
+        ("Duloxetine", "100 tablets", "KES 1,350.00"),
+        ("Trazodone", "100 tablets", "KES 1,050.00"),
+        ("Mirtazapine", "100 tablets", "KES 650.00"),
+        ("Paroxetine", "100 tablets", "KES 500.00"),
+        ("Fluoxetine", "100 tablets", "KES 800.00"),
+        ("Sertraline", "100 tablets", "KES 750.00"),
+        ("Citalopram", "100 tablets", "KES 450.00"),
+    ]
+    dt = Tableview(
+        master=frame2,
+        coldata=coldata,
+        rowdata=rowdata,
+        paginated=False,
+        searchable=True,
+        bootstyle=PRIMARY,
+        stripecolor=(colors.light, None),
+    )
+    dt.pack(fill=BOTH, expand=YES, padx=10, pady=10)
+
+
+root = bootstrap.Window(themename="morph")
+root.title = "BENORA DASHBOARD"
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+root.geometry(f"{screen_width}x{screen_height}")
+colors = root.style.colors
+
+frame1 = bootstrap.Frame(root, bootstyle="dark", width=220)
+frame1.pack(side="left", fill="y", expand=False, padx=1, pady=1)
+
+admin = ImageTk.PhotoImage(Image.open("LoginSystem\Adminlogo.jpg"))
+admin_label = Label(master=frame1, image=admin, width=260, height=220)
+admin_label.pack(padx=10, pady=10, fill="both")
+
+# Define buttons with their corresponding section functions
+button_data = [
+    ("Dashboard", open_dashboard),
+    ("Invoice", open_invoice),
+    ("Sales", open_sales),
+    ("Pharmacist", open_pharmacist),
+    ("Medicine", open_medicine)
+]
+
+# Create and pack the buttons in frame1
+buttons = []
+for text, section_func in button_data:
+    button = bootstrap.Button(frame1, text=text, bootstyle="dark", command=lambda func=section_func: open_section(func))
+    button.pack(fill="x", pady=10)
+    buttons.append(button)
+
+frame2 = bootstrap.Frame(root, bootstyle="light")
+frame2.pack(side="right", fill="both", expand=True, padx=1, pady=1)
+
+open_dashboard()
+root.mainloop()
